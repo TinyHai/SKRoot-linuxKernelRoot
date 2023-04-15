@@ -18,6 +18,7 @@ use crate::{
 // https://github.com/tiann/KernelSU/blob/main/userspace/ksud/src/ksu.rs#L75
 #[cfg(unix)]
 pub fn root_shell() -> anyhow::Result<()> {
+    get_root()?;
     // we are root now, this was set in kernel!
 
     let args: Vec<String> = std::env::args().collect();
@@ -114,8 +115,6 @@ pub fn root_shell() -> anyhow::Result<()> {
         free_idx += 1;
     }
 
-    get_root()?;
-
     let mut uid = 0; // default uid = 0(root)
     if free_idx < matches.free.len() {
         let name = &matches.free[free_idx];
@@ -193,7 +192,7 @@ fn set_identity(uid: u32) {
 }
 
 fn print_usage(program: &str, opts: Options) {
-    let brief = format!("Usage: SKRoot {}", program);
+    let brief = format!("SKRoot\n\nUsage: {program} [options] [-] [user [argument...]]");
     print!("{}", opts.usage(&brief));
 }
 
