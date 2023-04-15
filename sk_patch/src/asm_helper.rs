@@ -9,10 +9,10 @@ use std::{
 use anyhow::{anyhow, Ok};
 
 #[cfg(not(windows))]
-pub const LINE_ENDLING: &'static str = "\n";
+pub const LINE_ENDLING: &str = "\n";
 
 #[cfg(windows)]
-pub const LINE_ENDLING: &'static str = "\r\n";
+pub const LINE_ENDLING: &str = "\r\n";
 
 #[macro_export]
 macro_rules! aarch64 {

@@ -43,7 +43,7 @@ impl Patcher {
         );
         Ok(Self {
             image: RefCell::new(image_file),
-            image_path: image_path,
+            image_path,
             patches: vec![],
         })
     }
@@ -53,8 +53,8 @@ impl Patcher {
         let bytes = root_key.as_bytes();
         let root_key_size = bytes.len();
         self.add_patch(offset, bytes.to_vec(), true);
-        let next_offset = offset + root_key_size;
-        next_offset
+        
+        offset + root_key_size
     }
 
     pub fn patch_do_execve(&mut self, hook: DoExecveHook) -> anyhow::Result<usize> {

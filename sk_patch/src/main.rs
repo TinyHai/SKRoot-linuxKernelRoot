@@ -115,7 +115,7 @@ where
                 continue;
             }
         };
-        match parser(&buf.trim()) {
+        match parser(buf.trim()) {
             Ok(result) => {
                 break result;
             }

@@ -158,7 +158,7 @@ pub fn inject_path_to_pid(pid: pid_t, path_to_add: &str) -> anyhow::Result<()> {
 
     let mut buff = vec![];
     buff.write_all(path_to_add.as_bytes())?;
-    buff.push(':' as u8);
+    buff.push(b':');
     let mut tmp = 0u8;
     let mut count = 0;
     loop {
@@ -213,47 +213,48 @@ pub fn inject_path_to_pid(pid: pid_t, path_to_add: &str) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn prepare_mmap_params<'a>(
-    parameters: &'a mut [u64],
+macro_rules! prepare_params {
+    ($params:ident, $($arg:ident),+) => {{
+        let mut idx = 0;
+        $(
+            ($params)[idx] = $arg as u64;
+            idx += 1;
+        )+
+        &($params)[0..idx]
+    }};
+}
+
+fn prepare_mmap_params(
+    parameters: &mut [u64],
     addr: *mut c_void,
     size: usize,
     prot: i32,
     flags: i32,
-) -> &'a [u64] {
-    parameters[0] = addr as u64;
-    parameters[1] = size as u64;
-    parameters[2] = prot as u64;
-    parameters[3] = flags as u64;
-    parameters[4] = 0;
-    parameters[5] = 0;
-    &parameters[0..=5]
+) -> &[u64] {
+    let fd = 0;
+    let offset = 0;
+    prepare_params!(parameters, addr, size, prot, flags, fd, offset)
 }
 
-fn prepare_munmap_params<'a>(
-    parameters: &'a mut [u64],
+fn prepare_munmap_params(
+    parameters: &mut [u64],
     addr: *const c_void,
     size: usize,
-) -> &'a [u64] {
-    parameters[0] = addr as u64;
-    parameters[1] = size as u64;
-    &parameters[0..=1]
+) -> &[u64] {
+    prepare_params!(parameters, addr, size)
 }
 
-fn prepare_getenv_params<'a>(parameters: &'a mut [u64], name: *const u8) -> &'a [u64] {
-    parameters[0] = name as u64;
-    &parameters[0..=0]
+fn prepare_getenv_params(parameters: &mut [u64], name: *const u8) -> &[u64] {
+    prepare_params!(parameters, name)
 }
 
-fn prepare_setenv_params<'a>(
-    parameters: &'a mut [u64],
+fn prepare_setenv_params(
+    parameters: &mut [u64],
     name: *const u8,
     value: *const u8,
     rewrite: usize,
-) -> &'a [u64] {
-    parameters[0] = name as u64;
-    parameters[1] = value as u64;
-    parameters[2] = rewrite as u64;
-    &parameters[0..=2]
+) -> &[u64] {
+    prepare_params!(parameters, name, value, rewrite)
 }
 
 pub fn find_pid_by_cmd(cmd: &str, timeout: Duration) -> anyhow::Result<pid_t> {

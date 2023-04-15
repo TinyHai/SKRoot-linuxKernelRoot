@@ -98,9 +98,8 @@ impl PtraceWrapper {
         let num_parms_regs = 8;
         let parms_len = parameters.len();
         let parms_by_regs = min(num_parms_regs, parms_len);
-        for i in 0..parms_by_regs {
-            regs.regs[i] = parameters[i];
-        }
+
+        regs.regs.copy_from_slice(parameters);
 
         if parms_len > num_parms_regs {
             regs.sp -= ((parms_len - num_parms_regs) * size_of::<u64>()) as u64;

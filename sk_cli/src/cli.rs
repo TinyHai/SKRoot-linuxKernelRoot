@@ -151,7 +151,7 @@ fn deploy_su(root_key: &str, su_path: &str, target: &str) -> Result<()> {
         }
     }
 
-    let encrypted_root_key = encry(&root_key, &get_default_key());
+    let encrypted_root_key = encry(root_key, &get_default_key());
     let target_su_parent_path_name = format!("su_{}", encrypted_root_key);
     let target_su_parent_dir = &PathBuf::from(target).join(target_su_parent_path_name);
     let target_su_path = &target_su_parent_dir.join("su");
@@ -160,7 +160,7 @@ fn deploy_su(root_key: &str, su_path: &str, target: &str) -> Result<()> {
         "deploy create dir {}",
         target_su_parent_dir.to_string_lossy()
     );
-    let _ = DirBuilder::new().create(&target_su_parent_dir)?;
+    DirBuilder::new().create(target_su_parent_dir)?;
     trace!(
         "deploy copy {} -> {}",
         su_path,

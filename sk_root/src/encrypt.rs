@@ -45,9 +45,9 @@ fn _encry(base64_src: String, key: &str) -> String {
 
     let mut key_pos = 0usize;
     let mut v: u8;
-    for i in 0..src_bytes.len() {
-        v = ((src_bytes[i] as u16 + offset as u16) % 255) as u8;
-        v = v ^ key_bytes[key_pos];
+    for &src_byte in src_bytes {
+        v = ((src_byte as u16 + offset as u16) % 255) as u8;
+        v ^= key_bytes[key_pos];
 
         write!(&mut buff, "{:02x}", v).unwrap();
         result.append(&mut buff);
@@ -89,12 +89,12 @@ fn _uncry(src: &str, key: &str) -> String {
     while i < src_len {
         v = u8::from_str_radix(std::str::from_utf8(&src_bytes[i..i + 2]).unwrap(), 16).unwrap();
         next_offset = v;
-        v = v ^ key_bytes[key_pos];
+        v ^= key_bytes[key_pos];
 
         if v <= offset {
-            v = (255u8 - offset) + v;
+            v += 255u8 - offset;
         } else {
-            v = v - offset;
+            v -= offset;
         }
 
         result.push(v);
